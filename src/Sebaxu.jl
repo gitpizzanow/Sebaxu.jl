@@ -1,4 +1,4 @@
-module MyPCAPlots
+module Sebaxu
 
 using Plots
 export plot_pca
