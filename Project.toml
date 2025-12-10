@@ -1,6 +1,8 @@
 name = "Sebaxu"
-uuid = "950ad09b-307f-438b-9b61-dfcb3fec248a"
-authors = ["Shraoui Tarik Ziad <sahraouitrikziad@gmail.com>"]
+# To generate a new UUID for your package, open the Julia REPL,
+# type `using UUIDs` and then run `uuid4()`.
+uuid = "950ad09b-307f-438b-9b61-dfcb3fec248a" 
+authors = ["Sahraoui Tarik Ziad <sahraouitrikziad@gmail.com>"]
 version = "0.1.0"
 
 [deps]
