@@ -3,7 +3,7 @@ module Sebaxu
 using Plots
 export plot_pca
 
-function plot_PCA(matrix; labels=nothing, title="", verbose=true)
+function plot_pca(matrix; labels=nothing, title="", verbose=true)
     """
     Plot PCA results for either individuals or variables (correlation circle).
     
@@ -158,7 +158,7 @@ function plot_PCA(matrix; labels=nothing, title="", verbose=true)
         else
             # Unexpected error - provide context
             println("\n" * "="^60)
-            println("UNEXPECTED ERROR occurred in plot_PCA()")
+            println("UNEXPECTED ERROR occurred in plot_pca()")
             println("="^60)
             println("Error type: $(typeof(e))")
             println("Error message: $e")
