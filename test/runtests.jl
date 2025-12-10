@@ -19,8 +19,10 @@ using Plots
     @testset "Custom labels" begin
         CP = [1.2 0.5; 0.8 1.0; 0.3 0.7]
         labels = ["A", "B", "C"]
-        plt = Sebaxu.plot_pca(CP, labels=labels, verbose=false)
+        plt = Sebaxu.plot_pca(CP, labels=labels, verbose=false, title="My Title")
         @test plt isa Plots.Plot
+        @test plt.series_list[1].plotattributes[:markersize] == 6 # Individuals plot
+        @test plt.attr[:title] == "My Title"
     end
     
     @testset "Custom title" begin
@@ -64,12 +66,16 @@ using Plots
         # Variables should get X1, X2, ... labels
         variable_coords = [0.8 0.5; 0.5 0.7; 0.3 0.9]
         plt = Sebaxu.plot_pca(variable_coords, verbose=false)
-        @test plt isa Plots.Plot
+        # Test that it's a correlation circle (quiver series for arrows)
+        @test any(s.plotattributes[:seriestype] == :quiver for s in plt.series_list)
+        @test plt.attr[:title] == "PCA: Variables (Correlation Circle)"
         
         # Individuals should get Ind1, Ind2, ... labels
         CP = [1.2 0.5; 0.8 1.0; 0.3 0.7]
         plt = Sebaxu.plot_pca(CP, verbose=false)
-        @test plt isa Plots.Plot
+        # Test that it's a scatter plot
+        @test plt.series_list[1].plotattributes[:seriestype] == :scatter
+        @test plt.attr[:title] == "PCA: Individuals"
     end
     
     @testset "Edge cases" begin

@@ -3,20 +3,22 @@ module Sebaxu
 using Plots
 export plot_pca
 
-function plot_pca(matrix; labels=nothing, title="", verbose=true)
-    """
-    Plot PCA results for either individuals or variables (correlation circle).
-    
-    Parameters:
-    - matrix: n×2 matrix (PC1 and PC2 coordinates)
-    - labels: optional vector of labels (auto-generated if not provided)
-    - title: optional plot title
-    - verbose: if true, prints diagnostic information
-    
-    Returns:
-    - plt: the plot object
-    """
-    
+"""
+    plot_pca(matrix::AbstractMatrix{<:Real}; labels::Union{Nothing, AbstractVector{<:AbstractString}}=nothing, title::AbstractString="", verbose::Bool=true)
+
+Plot PCA results for either individuals or variables (correlation circle).
+
+The function automatically detects the plot type:
+- **Correlation Circle**: If all absolute values in `matrix` are ≤ 1.
+- **Individuals Plot**: Otherwise.
+
+# Arguments
+- `matrix`: An `n×2` matrix of `Real` numbers containing the PC1 and PC2 coordinates.
+- `labels`: An optional vector of strings for labeling points. If `nothing`, labels are auto-generated (`"Ind1", "Ind2", ...` or `"X1", "X2", ...`).
+- `title`: An optional string for the plot title.
+- `verbose`: If `true`, prints diagnostic information before plotting.
+"""
+function plot_pca(matrix::AbstractMatrix{<:Real}; labels::Union{Nothing, AbstractVector{<:AbstractString}}=nothing, title::AbstractString="", verbose::Bool=true)
     # ===== ERROR CHECKING =====
     try
         # Check if matrix is actually a matrix/array
