@@ -1,12 +1,13 @@
 module Sebaxu
 
 using Plots
+using Dates
 export plot_pca
 
 """
-    plot_pca(matrix::AbstractMatrix{<:Real}; labels::Union{Nothing, AbstractVector{<:AbstractString}}=nothing, title::AbstractString="", verbose::Bool=true)
+    plot_pca(matrix::AbstractMatrix{<:Real}; labels::Union{Nothing, AbstractVector{<:AbstractString}}=nothing, title::AbstractString="", verbose::Bool=true, save_plot::Bool=true, output_dir::AbstractString="pca_plots")
 
-Plot PCA results for either individuals or variables (correlation circle).
+Plot PCA results for either individuals or variables (correlation circle) and optionally save to disk.
 
 The function automatically detects the plot type:
 - **Correlation Circle**: If all absolute values in `matrix` are ≤ 1.
@@ -17,8 +18,10 @@ The function automatically detects the plot type:
 - `labels`: An optional vector of strings for labeling points. If `nothing`, labels are auto-generated (`"Ind1", "Ind2", ...` or `"X1", "X2", ...`).
 - `title`: An optional string for the plot title.
 - `verbose`: If `true`, prints diagnostic information before plotting.
+- `save_plot`: If `true`, automatically saves the plot to disk (default: true).
+- `output_dir`: Directory name for saving plots (default: "pca_plots").
 """
-function plot_pca(matrix::AbstractMatrix{<:Real}; labels::Union{Nothing, AbstractVector{<:AbstractString}}=nothing, title::AbstractString="", verbose::Bool=true)
+function plot_pca(matrix::AbstractMatrix{<:Real}; labels::Union{Nothing, AbstractVector{<:AbstractString}}=nothing, title::AbstractString="", verbose::Bool=true, save_plot::Bool=true, output_dir::AbstractString="pca_plots")
     # ===== ERROR CHECKING =====
     try
         # Check if matrix is actually a matrix/array
@@ -85,6 +88,16 @@ function plot_pca(matrix::AbstractMatrix{<:Real}; labels::Union{Nothing, Abstrac
             plot_type = all(abs.(matrix) .<= 1) ? "variables" : "individuals"
         end
         
+        # ===== CREATE OUTPUT DIRECTORY =====
+        if save_plot
+            if !isdir(output_dir)
+                mkpath(output_dir)
+                if verbose
+                    println("Created directory: $output_dir")
+                end
+            end
+        end
+        
         # ===== VERBOSE OUTPUT =====
         if verbose
             println("="^60)
@@ -95,6 +108,9 @@ function plot_pca(matrix::AbstractMatrix{<:Real}; labels::Union{Nothing, Abstrac
             println("PC1 range: [$(minimum(matrix[:,1])), $(maximum(matrix[:,1]))]")
             println("PC2 range: [$(minimum(matrix[:,2])), $(maximum(matrix[:,2]))]")
             println("Labels: $labels")
+            if save_plot
+                println("Output directory: $output_dir")
+            end
             println("="^60)
         end
         
@@ -145,16 +161,48 @@ function plot_pca(matrix::AbstractMatrix{<:Real}; labels::Union{Nothing, Abstrac
         end
         
         display(plt)
+        
+        # ===== SMART FILE NAMING AND SAVING =====
+        if save_plot
+            # Generate smart filename
+            timestamp = Dates.format(now(), "yyyymmdd_HHMMSS")
+            
+            # Use title if provided, otherwise use plot type
+            base_name = if title != ""
+                # Clean title: remove special characters, replace spaces with underscores
+                cleaned_title = replace(title, r"[^\w\s-]" => "")
+                cleaned_title = replace(cleaned_title, r"\s+" => "_")
+                cleaned_title = lowercase(cleaned_title)
+                cleaned_title
+            else
+                plot_type == "variables" ? "pca_variables" : "pca_individuals"
+            end
+            
+            # Add number of points info
+            n_points_str = "$(n)pts"
+            
+            # Construct filename: type_npoints_timestamp.png
+            filename = "$(base_name)_$(n_points_str)_$(timestamp).png"
+            filepath = joinpath(output_dir, filename)
+            
+            # Save the plot
+            savefig(plt, filepath)
+            
+            if verbose
+                println("\n✓ Plot saved to: $filepath")
+            end
+        end
+        
         return plt
         
     catch e
         # Custom error handling
-        if isa(e, ErrorException) && startswith(e.msg, "INPUT ERROR") || 
+        if isa(e, ErrorException) && (startswith(e.msg, "INPUT ERROR") || 
            startswith(e.msg, "DIMENSION ERROR") || 
            startswith(e.msg, "EMPTY MATRIX ERROR") ||
            startswith(e.msg, "DATA ERROR") ||
            startswith(e.msg, "LABELS ERROR") ||
-           startswith(e.msg, "LABELS MISMATCH ERROR")
+           startswith(e.msg, "LABELS MISMATCH ERROR"))
             # Our custom errors - just rethrow
             rethrow(e)
         else
