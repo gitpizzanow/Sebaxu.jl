@@ -41,21 +41,46 @@ function plot_pca(matrix::AbstractMatrix{<:Real};
             error("DATA ERROR: Matrix contains Inf values.")
         end
         
-        # ===== LABEL GENERATION =====
-        if labels === nothing
-            if all(abs.(matrix) .<= 1)
-                labels = ["X$i" for i in 1:n]
-                plot_type = "variables"
-            else
-                labels = ["Ind$i" for i in 1:n]
-                plot_type = "individuals"
-            end
+       # Replace the label generation section in your plot_pca function with this:
+
+# ===== SMART LABEL GENERATION WITH IMPROVED DETECTION =====
+if labels === nothing
+    # Improved detection: Variables should be between -1 and 1 AND typically fewer in number
+    # Also check if values cluster around typical correlation ranges
+    if all(abs.(matrix) .<= 1) && n <= 20
+        # Additional check: if range is very small and centered near 0, likely correlations
+        max_val = maximum(abs.(matrix))
+        if max_val >= 0.3  # Correlations typically have meaningful magnitude
+            labels = ["X$i" for i in 1:n]
+            plot_type = "variables"
         else
-            if length(labels) != n
-                error("LABELS MISMATCH ERROR: Number of labels ($(length(labels))) doesn't match rows ($n).")
-            end
-            plot_type = all(abs.(matrix) .<= 1) ? "variables" : "individuals"
+            # Small values but likely individuals (e.g., standardized PCA scores)
+            labels = ["Ind$i" for i in 1:n]
+            plot_type = "individuals"
         end
+    else
+        # Definitely individuals
+        labels = ["Ind$i" for i in 1:n]
+        plot_type = "individuals"
+    end
+else
+    # When labels are provided, use them to guess plot type
+    if !isa(labels, AbstractVector)
+        error("LABELS ERROR: labels must be a vector/array.")
+    end
+    
+    if length(labels) != n
+        error("LABELS MISMATCH ERROR: Number of labels ($(length(labels))) doesn't match rows ($n).")
+    end
+    
+    # Check if labels suggest variables (X1, X2, Var1, Variable, etc.) or individuals
+    label_str = join(lowercase.(string.(labels)), " ")
+    if occursin(r"^x\d+|var|variable|feature|gene", label_str) && all(abs.(matrix) .<= 1)
+        plot_type = "variables"
+    else
+        plot_type = "individuals"
+    end
+end
         
         # ===== CREATE OUTPUT DIRECTORY =====
         if save_plot && !isdir(output_dir)
