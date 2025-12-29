@@ -1,27 +1,18 @@
 # Sebaxu.jl
 
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://gitpizzanow.github.io/Sebaxu.jl/stable/)
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://gitpizzanow.github.io/Sebaxu.jl/dev/)
-[![Build Status](https://github.com/gitpizzanow/Sebaxu.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/gitpizzanow/Sebaxu.jl/actions/workflows/CI.yml?query=branch%3Amain)
-
-Sebaxu.jl is a Julia package for creating Principal Component Analysis (PCA) visualizations. It provides an easy-to-use interface for generating both individual and variable (correlation circle) PCA plots.
+A Julia package for creating beautiful and informative PCA (Principal Component Analysis) visualizations with minimal code.
 
 ## Installation
 
+1. Add the package from GitHub:
+
 ```julia
 using Pkg
-Pkg.add("Sebaxu")
+Pkg.add(url="https://github.com/gitpizzanow/Sebaxu.jl")
 ```
 
-## Features
+2. Load the package:
 
-- Plot PCA results for both individuals and variables
-- Automatic detection of plot type based on input data
-- Customizable labels and titles
-- Support for saving plots to files
-- Comprehensive error handling
-
-## Usage
 
 ### Basic Usage
 
