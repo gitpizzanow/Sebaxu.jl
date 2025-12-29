@@ -172,24 +172,35 @@ end
             
         else
             # Individuals scatter plot
-            xlims_plot = (minimum(matrix[:,1])-0.5, maximum(matrix[:,1])+0.5)
-            ylims_plot = (minimum(matrix[:,2])-0.5, maximum(matrix[:,2])+0.5)
+            # Calculate axis limits to ensure (0,0) is centered
+            x_min, x_max = extrema(matrix[:,1])
+            y_min, y_max = extrema(matrix[:,2])
+            max_range = max(x_max - x_min, y_max - y_min) / 2
+            center_x = (x_max + x_min) / 2
+            center_y = (y_max + y_min) / 2
+            
+            xlims_plot = (center_x - max_range * 1.1, center_x + max_range * 1.1)
+            ylims_plot = (center_y - max_range * 1.1, center_y + max_range * 1.1)
             
             plt = scatter(matrix[:,1], matrix[:,2],
-                          xlabel="PC1", 
-                          ylabel="PC2",
-                          title=title=="" ? "PCA: Individuals" : title,
-                          label="",
-                          markersize=6, 
-                          markercolor=:blue,
-                          legend=false, 
-                          aspect_ratio=:equal,
-                          xlims=xlims_plot, 
-                          ylims=ylims_plot)
+                        xlabel="PC1", 
+                        ylabel="PC2",
+                        title=title=="" ? "PCA: Individuals" : title,
+                        label="",
+                        markersize=6, 
+                        markercolor=:blue,
+                        legend=false, 
+                        aspect_ratio=:equal,
+                        xlims=xlims_plot, 
+                        ylims=ylims_plot,
+                        grid=true,
+                        gridstyle=:dash,
+                        gridalpha=0.3,
+                        framestyle=:box)
             
-            # Add axes - ONLY at x=0 and y=0
-            hline!(plt, [0], color=:gray, linestyle=:dash, linewidth=1, label="")
-            vline!(plt, [0], color=:gray, linestyle=:dash, linewidth=1, label="")
+            # Add axes with better visibility
+            hline!(plt, [0], color=:black, linestyle=:solid, linewidth=1.5, label="")
+            vline!(plt, [0], color=:black, linestyle=:solid, linewidth=1.5, label="")
             
             # Add labels for each individual
             for i in 1:n
