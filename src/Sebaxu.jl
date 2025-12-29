@@ -8,7 +8,7 @@ module Sebaxu
 
 using Plots
 using Dates
-import Base.Printf: @printf, @sprintf, printf, sprintf
+using Printf
 
 export plot_pca
 

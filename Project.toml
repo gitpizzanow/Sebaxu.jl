@@ -7,7 +7,6 @@ authors = ["Sahraoui Tarik Ziad <sahraouitrikziad@gmail.com>"]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 
 [compat]
 DataFrames = "1.8.1"
@@ -16,6 +15,7 @@ julia = "1.6"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 
 [targets]
 test = ["Test"]
