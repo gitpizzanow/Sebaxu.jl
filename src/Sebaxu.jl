@@ -1,14 +1,48 @@
+"""
+    Sebaxu
+
+A Julia package for creating Principal Component Analysis (PCA) visualizations.
+It provides an easy-to-use interface for generating both individual and variable (correlation circle) PCA plots.
+"""
 module Sebaxu
 
 using Plots
 using Dates
+using Printf
 
 export plot_pca
 
 """
-    plot_pca(matrix::AbstractMatrix{<:Real}; ...)
+    plot_pca(matrix::AbstractMatrix{<:Real}; 
+             labels::Union{Nothing, AbstractVector{<:AbstractString}}=nothing, 
+             title::AbstractString="", 
+             verbose::Bool=true, 
+             save_plot::Bool=true, 
+             output_dir::AbstractString="pca_plots")
 
 Plot PCA results for either individuals or variables (correlation circle).
+
+# Arguments
+- `matrix`: A 2-column matrix containing the PCA coordinates (PC1 in first column, PC2 in second column)
+- `labels`: Optional vector of labels for each point/variable. If not provided, default labels will be generated.
+- `title`: Optional title for the plot
+- `verbose`: If `true`, prints diagnostic information
+- `save_plot`: If `true`, saves the plot to a file
+- `output_dir`: Directory to save the plot (created if it doesn't exist)
+
+# Returns
+- A Plots.jl plot object
+
+# Examples
+```julia
+# For individual points
+individuals = [1.2 0.5; 0.8 1.0; 0.3 0.7]
+plot_pca(individuals)
+
+# For variables (correlation circle)
+variables = [0.8 0.5; 0.5 0.7]
+plot_pca(variables, labels=["Var1", "Var2"], title="Correlation Circle")
+```
 """
 function plot_pca(matrix::AbstractMatrix{<:Real}; 
                   labels::Union{Nothing, AbstractVector{<:AbstractString}}=nothing, 
@@ -17,28 +51,31 @@ function plot_pca(matrix::AbstractMatrix{<:Real};
                   save_plot::Bool=true, 
                   output_dir::AbstractString="pca_plots")
     
-    # ===== ERROR CHECKING =====
+    # ===== INPUT VALIDATION =====
     try
-        if !isa(matrix, AbstractMatrix)
-            error("INPUT ERROR: Expected a matrix, but got $(typeof(matrix)).")
+        # Check input type
+        if !(matrix isa AbstractMatrix{<:Real})
+            throw(ArgumentError("Input must be a matrix of real numbers, got $(typeof(matrix))"))
         end
         
         n, m = size(matrix)
         
+        # Check matrix dimensions
         if m != 2
-            error("DIMENSION ERROR: Matrix must have exactly 2 columns (PC1 and PC2).")
+            throw(DimensionMismatch("Matrix must have exactly 2 columns (PC1 and PC2), got $m columns"))
         end
         
         if n == 0
-            error("EMPTY MATRIX ERROR: Matrix has 0 rows.")
+            throw(ArgumentError("Matrix must have at least one row"))
         end
         
-        if any(isnan.(matrix))
-            error("DATA ERROR: Matrix contains NaN values.")
+        # Check for invalid values
+        if any(isnan, matrix)
+            throw(ArgumentError("Matrix contains NaN values"))
         end
         
-        if any(isinf.(matrix))
-            error("DATA ERROR: Matrix contains Inf values.")
+        if any(isinf, matrix)
+            throw(ArgumentError("Matrix contains Inf values"))
         end
         
        # Replace the label generation section in your plot_pca function with this:
